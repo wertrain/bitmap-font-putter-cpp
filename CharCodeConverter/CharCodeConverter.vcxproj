@@ -111,6 +111,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\GameMain.cpp" />
+    <ClCompile Include="Sources\WinMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Headers\Constants.h" />
+    <ClInclude Include="Headers\GameMain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
