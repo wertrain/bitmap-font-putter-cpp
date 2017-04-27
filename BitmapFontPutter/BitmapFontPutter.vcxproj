@@ -33,6 +33,7 @@
     <ProjectGuid>{8CF56D39-4542-4374-AD8F-EE73F23BFFEB}</ProjectGuid>
     <RootNamespace>CharCodeConverter</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <ProjectName>BitmapFontPutter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

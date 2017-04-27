@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CharCodeConverter", "CharCodeConverter\CharCodeConverter.vcxproj", "{8CF56D39-4542-4374-AD8F-EE73F23BFFEB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BitmapFontPutter", "BitmapFontPutter\BitmapFontPutter.vcxproj", "{8CF56D39-4542-4374-AD8F-EE73F23BFFEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
