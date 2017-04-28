@@ -1,4 +1,4 @@
-# char-code-converter-cpp
+# bitmap-font-putter-cpp
 
 文字コードから、フォント画像データの文字位置を計算し、画像を切り抜いて、指定の文字として画面に表示します。  
 
