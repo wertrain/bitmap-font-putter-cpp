@@ -18,15 +18,22 @@ public:
 public:
 	BitmapFont();
 	~BitmapFont();
-	bool ReadFromFile(const std::string& filename);
+	bool Create(const std::string& filename);
 	void Destroy();
 
+	uint32_t Draw(const HDC hdc);
+
+protected:
 	uint32_t BitmapFont::GetCharPos(const uint32_t c);
 
 protected:
 	HBITMAP m_hBmpData;
 	BITMAP m_BmpData;
 	HDC m_hMemdc;
+	uint8_t* m_pBmpRawData;
+	uint8_t* m_pBmpPixelBuffer;
+	uint32_t m_BmpWidth;
+	uint32_t m_BmpHeight;
 };
 
 #endif // BITMAPFONT_H

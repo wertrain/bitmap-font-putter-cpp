@@ -8,38 +8,51 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <io.h>
+#include <cassert>
 
 #include "BitmapFont.h"
 
 namespace
 {
-#pragma pack(push,1)
-	struct BitmapFileHeader
-	{
-		uint8_t bfType[2];
-		uint16_t bfSize[2];
-		uint16_t bfReserved1;
-		uint16_t bfReserved2;
-		uint16_t bfOffBits[2];
-	};
-#pragma pack(pop)
 
-#pragma pack(push,1)
-	struct BitmapInfoHeader
-	{
-		uint32_t biSize;
-		int32_t biWidth;
-		int32_t biHeight;
-		uint16_t biPlanes;
-		uint16_t biBitCount;
-		uint32_t biCompression;
-		uint32_t biSizeImage;
-		int32_t biXPixPerMeter;
-		int32_t biYPixPerMeter;
-		uint32_t biClrUsed;
-		uint32_t biClrImportant;
-	};
-#pragma pack(pop)
+#pragma pack(1)
+struct BitmapFileHeader
+{
+	uint8_t bfType[2];
+	uint16_t bfSize[2];
+	uint16_t bfReserved1;
+	uint16_t bfReserved2;
+	uint16_t bfOffBits[2];
+};
+#pragma pack()
+
+#pragma pack(1)
+struct BitmapInfoHeader
+{
+	uint32_t biSize;
+	int32_t biWidth;
+	int32_t biHeight;
+	uint16_t biPlanes;
+	uint16_t biBitCount;
+	uint32_t biCompression;
+	uint32_t biSizeImage;
+	int32_t biXPixPerMeter;
+	int32_t biYPixPerMeter;
+	uint32_t biClrUsed;
+	uint32_t biClrImportant;
+};
+#pragma pack()
+
+uint8_t* GetBmpFileData(uint8_t* rawDataBuffer, uint32_t& bmpWidth, uint32_t& bmpHeight, uint32_t& bitCount)
+{
+	BitmapInfoHeader* bmp_info_header_ptr = (BitmapInfoHeader*)(rawDataBuffer + sizeof(BitmapFileHeader));
+	bmpWidth = bmp_info_header_ptr->biWidth;
+	bmpHeight = bmp_info_header_ptr->biHeight;
+	bitCount = bmp_info_header_ptr->biBitCount;
+	uint8_t* bmpDataBuffer = rawDataBuffer + sizeof(BitmapFileHeader) + sizeof(BitmapInfoHeader);
+
+	return bmpDataBuffer;
+}
 
 const uint32_t FONT_IMAGE_LINE_NUM = 94; // = 1 区画あたりの文字数
 const uint32_t FONT_CHAR_DATA_SIZE = BitmapFont::FONT_CHAR_WIDTH * BitmapFont::FONT_CHAR_HEIGHT * BitmapFont::FONT_BIT;
@@ -50,38 +63,56 @@ const uint32_t FONT_CHAR_DATA_LINE_SIZE = FONT_CHAR_DATA_SIZE * FONT_IMAGE_LINE_
 BitmapFont::BitmapFont()
 	: m_hBmpData(NULL)
 	, m_hMemdc(NULL)
+	, m_pBmpRawData(nullptr)
+	, m_pBmpPixelBuffer(nullptr)
+	, m_BmpWidth(0)
+	, m_BmpHeight(0)
 {
+
 }
 
 BitmapFont::~BitmapFont()
 {
 }
 
-bool BitmapFont::ReadFromFile(const std::string& filename)
+bool BitmapFont::Create(const std::string& filename)
 {
-	// 画像読み込み
-	m_hBmpData = (HBITMAP)LoadImage(NULL, filename.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
-	if (m_hBmpData == NULL)
+	std::ifstream ifs;
+	ifs.open(filename.c_str(), std::ios::binary);
+	assert(ifs);
+	if (!ifs)
+	{
 		return false;
+	}
 
-	// ビットマップの情報を取得
-	GetObject(m_hBmpData, sizeof(BITMAP), &m_BmpData);
-	// メモリオブジェクトにコピー
-	m_hMemdc = CreateCompatibleDC(NULL);
-	SelectObject(m_hMemdc, m_hBmpData);
+	//終端までシーク -> 現在位置を取得 = ファイルサイズを取得
+	ifs.seekg(0, std::ios::end);
+	const size_t size = ifs.tellg();
+	m_pBmpRawData = new uint8_t[size];
 
-	int fd = open(fileName, O_RDONLY);
-	struct stat statBuf;
-	fstat(fd, &statBuf);
-	close(fd);
-	return (unsigned long)statBuf.st_size;
+	ifs.seekg(0);
+	ifs.read((char*)(m_pBmpRawData), size);
+	ifs.close();
+
+	uint32_t bitCount = 0;
+	m_pBmpPixelBuffer = ::GetBmpFileData(m_pBmpRawData, m_BmpWidth, m_BmpHeight, bitCount);
+	assert(bitCount == 32);
+	if (bitCount != 32)
+	{
+		return false;
+	}
 
 	return true;
 }
 
 void BitmapFont::Destroy()
 {
+	if (m_pBmpRawData)
+	{
+		delete[] m_pBmpRawData;
+		m_pBmpRawData = nullptr;
+	}
+
 	if (m_hMemdc)
 	{
 		DeleteDC(m_hMemdc);
@@ -92,6 +123,43 @@ void BitmapFont::Destroy()
 	{
 		DeleteObject(m_hBmpData);
 		m_hBmpData = NULL;
+	}
+}
+
+uint32_t BitmapFont::Draw(const HDC hdc)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		// ビットマップデータにおける文字の位置を取得する
+		const uint32_t charPos = GetCharPos(0x8a41 + i);
+		// 半角スペースや判別不明文字の場合はここに入る
+		if (charPos == 0)
+		{
+			// 空白をもうけるために幅だけを返す
+			return BitmapFont::FONT_CHAR_WIDTH / 4;
+		}
+
+		// 実際に描画する文字幅の最大・最小を取得する
+		uint32_t minWidth = 0;
+		uint32_t maxWidth = BitmapFont::FONT_CHAR_WIDTH;
+		//this->core->GetCharWidth(charPos, &minWidth, &maxWidth);
+
+		uint8_t* fontData = m_pBmpPixelBuffer + charPos;
+		for (int y = 0; y < BitmapFont::FONT_CHAR_HEIGHT; ++y)
+		{
+			for (int x = 0; x < BitmapFont::FONT_CHAR_WIDTH; ++x)
+				// 実際にピクセルが存在する範囲のみで描画を行う
+				//for (int j = minWidth; j < minWidth + maxWidth; ++j)
+			{
+				uint8_t* bmpDataPtr = fontData;
+				// 上下反転
+				//bmpDataPtr += BitmapFont::FONT_BIT * (this->core->fontBitmapWidth * (SFWFont::FONT_CHAR_HEIGHT - i) + j);
+				// ピクセルデータ取得
+				uint8_t r = (*(bmpDataPtr + 2)), g = (*(bmpDataPtr + 1)), b = (*(bmpDataPtr + 0)), a = (*(bmpDataPtr + 3));
+
+				SetPixel(hdc, 64 + x + (64 * i), 64 + y, RGB(r, g, b));
+			}
+		}
 	}
 }
 
@@ -168,6 +236,6 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
 		}
 	}
 
-	return の;
+	return charPos;
 }
 
