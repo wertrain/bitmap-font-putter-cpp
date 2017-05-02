@@ -83,7 +83,7 @@ DWORD WINAPI GameMainFunc(LPVOID vdParam)
             gameWindow->hScreenDC,
             0, 0,
             SRCCOPY);
-        PatBlt(gameWindow->hScreenDC, 0, 0, gameWindow->size.cx,gameWindow->size.cy, BLACKNESS); // 裏画面を黒で初期化
+        PatBlt(gameWindow->hScreenDC, 0, 0, gameWindow->size.cx,gameWindow->size.cy, WHITENESS); // 裏画面を黒で初期化
         EndPaint(gameWindow->hWnd, &ps);
 
         // ウインドウの再描画

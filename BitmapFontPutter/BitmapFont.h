@@ -10,8 +10,8 @@ class BitmapFont
 public:
 	enum
 	{
-		FONT_CHAR_WIDTH = 16,
-		FONT_CHAR_HEIGHT = 22,
+		FONT_CHAR_WIDTH = 31,
+		FONT_CHAR_HEIGHT = 37,
 		FONT_BIT = 4
 	};
 

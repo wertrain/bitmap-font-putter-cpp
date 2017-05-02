@@ -19,10 +19,10 @@ namespace
 struct BitmapFileHeader
 {
 	uint8_t bfType[2];
-	uint16_t bfSize[2];
+	uint32_t bfSize;
 	uint16_t bfReserved1;
 	uint16_t bfReserved2;
-	uint16_t bfOffBits[2];
+	uint32_t bfOffBits;
 };
 #pragma pack()
 
@@ -45,11 +45,13 @@ struct BitmapInfoHeader
 
 uint8_t* GetBmpFileData(uint8_t* rawDataBuffer, uint32_t& bmpWidth, uint32_t& bmpHeight, uint32_t& bitCount)
 {
-	BitmapInfoHeader* bmp_info_header_ptr = (BitmapInfoHeader*)(rawDataBuffer + sizeof(BitmapFileHeader));
+	const BitmapFileHeader* bmp_file_header_ptr = (BitmapFileHeader*)(rawDataBuffer);
+	const BitmapInfoHeader* bmp_info_header_ptr = (BitmapInfoHeader*)(rawDataBuffer + sizeof(BitmapFileHeader));
 	bmpWidth = bmp_info_header_ptr->biWidth;
 	bmpHeight = bmp_info_header_ptr->biHeight;
 	bitCount = bmp_info_header_ptr->biBitCount;
-	uint8_t* bmpDataBuffer = rawDataBuffer + sizeof(BitmapFileHeader) + sizeof(BitmapInfoHeader);
+
+	uint8_t* bmpDataBuffer = rawDataBuffer + bmp_file_header_ptr->bfOffBits;
 
 	return bmpDataBuffer;
 }
@@ -128,39 +130,7 @@ void BitmapFont::Destroy()
 
 uint32_t BitmapFont::Draw(const HDC hdc)
 {
-	for (int i = 0; i < 10; ++i)
-	{
-		// ビットマップデータにおける文字の位置を取得する
-		const uint32_t charPos = GetCharPos(0x8a41 + i);
-		// 半角スペースや判別不明文字の場合はここに入る
-		if (charPos == 0)
-		{
-			// 空白をもうけるために幅だけを返す
-			return BitmapFont::FONT_CHAR_WIDTH / 4;
-		}
-
-		// 実際に描画する文字幅の最大・最小を取得する
-		uint32_t minWidth = 0;
-		uint32_t maxWidth = BitmapFont::FONT_CHAR_WIDTH;
-		//this->core->GetCharWidth(charPos, &minWidth, &maxWidth);
-
-		uint8_t* fontData = m_pBmpPixelBuffer + charPos;
-		for (int y = 0; y < BitmapFont::FONT_CHAR_HEIGHT; ++y)
-		{
-			for (int x = 0; x < BitmapFont::FONT_CHAR_WIDTH; ++x)
-				// 実際にピクセルが存在する範囲のみで描画を行う
-				//for (int j = minWidth; j < minWidth + maxWidth; ++j)
-			{
-				uint8_t* bmpDataPtr = fontData;
-				// 上下反転
-				//bmpDataPtr += BitmapFont::FONT_BIT * (this->core->fontBitmapWidth * (SFWFont::FONT_CHAR_HEIGHT - i) + j);
-				// ピクセルデータ取得
-				uint8_t r = (*(bmpDataPtr + 2)), g = (*(bmpDataPtr + 1)), b = (*(bmpDataPtr + 0)), a = (*(bmpDataPtr + 3));
-
-				SetPixel(hdc, 64 + x + (64 * i), 64 + y, RGB(r, g, b));
-			}
-		}
-	}
+	return 0;
 }
 
 uint32_t BitmapFont::GetCharPos(const uint32_t c)
