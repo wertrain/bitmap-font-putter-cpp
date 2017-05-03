@@ -4,4 +4,4 @@
 
 ## 関連
 このプロジェクトで使用する画像データは以下のツールで出力しました。  
-[https://github.com/wertrain/bitmap-font-generator-cs](ttps://github.com/wertrain/bitmap-font-generator-cs)
+[https://github.com/wertrain/bitmap-font-generator-cs](https://github.com/wertrain/bitmap-font-generator-cs)
