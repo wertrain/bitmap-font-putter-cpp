@@ -130,6 +130,48 @@ void BitmapFont::Destroy()
 
 uint32_t BitmapFont::Draw(const HDC hdc)
 {
+	for (int i = 0; i < 1; ++i)
+	{
+		// ビットマップデータにおける文字の位置を取得する
+		const uint32_t charPos = GetCharPos(0x8120 + i);
+		// 半角スペースや判別不明文字の場合はここに入る
+		//if (charPos == 0)
+		//{
+		//	// 空白をもうけるために幅だけを返す
+		//	return BitmapFont::FONT_CHAR_WIDTH / 4;
+		//}
+
+		// 実際に描画する文字幅の最大・最小を取得する
+		uint32_t minWidth = 0;
+		uint32_t maxWidth = BitmapFont::FONT_CHAR_WIDTH;
+		//this->core->GetCharWidth(charPos, &minWidth, &maxWidth);
+
+		uint32_t* fontData = (uint32_t*)m_pBmpPixelBuffer + 2048 * 120;
+		uint8_t cpimt = 0;
+		for (int y = 0; y < BitmapFont::FONT_CHAR_HEIGHT; ++y)
+		{
+			for (int x = 0; x < BitmapFont::FONT_CHAR_WIDTH; ++x)
+				// 実際にピクセルが存在する範囲のみで描画を行う
+				//for (int j = minWidth; j < minWidth + maxWidth; ++j)
+			{
+				//uint8_t* bmpDataPtr = fontData;
+				// 上下反転
+				//int test = BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
+				//bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
+				//uint32_t aa = BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
+				// ピクセルデータ取得
+				//	uint8_t r = (*(bmpDataPtr + 1)), g = (*(bmpDataPtr + 2)), b = (*(bmpDataPtr + 3)), a = (*(bmpDataPtr + 0));
+				const uint32_t color = (*fontData);
+				uint8_t a = (color >> 24), r = (color >> 16 & 0xFF), g = (color >> 8 & 0xFF), b = (color & 0xFF);
+				if (a == 0) {
+					SetPixel(hdc, 64 + x + (BitmapFont::FONT_CHAR_WIDTH * i), 64 + y, RGB(255, 0, 0));
+					continue;
+				}
+				SetPixel(hdc, 64 + x + (BitmapFont::FONT_CHAR_WIDTH * i), 64 + y, RGB(r, g, b));
+				++fontData;
+			}
+		}
+	}
 	return 0;
 }
 
