@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BitmapFont.cpp" />
+    <ClCompile Include="CharCodeConverter.cpp" />
     <ClCompile Include="Framework\Sources\GameMain.cpp" />
     <ClCompile Include="Framework\Sources\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BitmapFont.h" />
+    <ClInclude Include="CharCodeConverter.h" />
     <ClInclude Include="Framework\Headers\Constants.h" />
     <ClInclude Include="Framework\Headers\GameMain.h" />
   </ItemGroup>
