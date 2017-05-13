@@ -58,7 +58,7 @@ class CharCodeConverter
         struct CodeData
         {
             int32_t mbchar;
-			int32_t index;
+            int32_t index;
             CodeData *pNext;
 
             CodeData()
