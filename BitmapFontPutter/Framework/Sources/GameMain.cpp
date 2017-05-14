@@ -14,8 +14,8 @@ BitmapFont* bitmapFont = nullptr;
 */
 bool Create(const HWND /*hWnd*/)
 {
-	bitmapFont = new BitmapFont();
-	return bitmapFont->Create(".\\Resources\\sjis.bmp");;
+    bitmapFont = new BitmapFont();
+    return bitmapFont->Create(".\\Resources\\sjis.bmp");;
 }
 
 /**
@@ -31,7 +31,7 @@ void Update(const DWORD /*nowTime*/)
 */
 void Draw(const HDC hDC)
 {
-	bitmapFont->Draw(hDC);
+    bitmapFont->Draw(hDC);
 }
 
 /**
@@ -39,6 +39,6 @@ void Draw(const HDC hDC)
 */
 void Destroy()
 {
-	bitmapFont->Destroy();
-	delete bitmapFont;
+    bitmapFont->Destroy();
+    delete bitmapFont;
 }
