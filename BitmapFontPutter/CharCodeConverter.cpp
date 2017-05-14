@@ -25,18 +25,18 @@ bool CharCodeConverter::Initialize()
     CodeData *data;
 
     // UTF16 to SJIS
-    data = &s_DataToSJIS[0];
+    data = &m_DataToSJIS[0];
     for (int32_t i = 0; i < CODE_TABLE_SIZE; ++i)
     {
         const int32_t key = UTF16Table[i] % CharCodeConverter::MAX_HASH_TABLE;
         data->mbchar = UTF16Table[i];
         data->index = i;
         
-        if(s_HashTableToSJIS[key] == NULL)
-            s_HashTableToSJIS[key] = data;
+        if(m_HashTableToSJIS[key] == NULL)
+            m_HashTableToSJIS[key] = data;
         else
         {
-            CodeData *p = s_HashTableToSJIS[key];
+            CodeData *p = m_HashTableToSJIS[key];
             while(p->pNext)
                 p = p->pNext;
             
@@ -47,18 +47,18 @@ bool CharCodeConverter::Initialize()
     }
 
     // SJIS to UTF16
-    data = &s_DataToUTF16[0];
+    data = &m_DataToUTF16[0];
     for (int32_t i = 0; i < CODE_TABLE_SIZE; ++i)
     {
         const int32_t key = SJISTable[i] % CharCodeConverter::MAX_HASH_TABLE;
         data->mbchar = SJISTable[i];
         data->index = i;
         
-        if(s_HashTableToUTF16[key] == NULL)
-            s_HashTableToUTF16[key] = data;
+        if(m_HashTableToUTF16[key] == NULL)
+            m_HashTableToUTF16[key] = data;
         else
         {
-            CodeData *p = s_HashTableToUTF16[key];
+            CodeData *p = m_HashTableToUTF16[key];
             while(p->pNext)
                 p = p->pNext;
             
@@ -79,7 +79,7 @@ void CharCodeConverter::Finalize()
 uint32_t CharCodeConverter::UTF16BEtoSJIS(const uint32_t c)
 {
     const int32_t key = c % CharCodeConverter::MAX_HASH_TABLE;
-    CodeData *p = s_HashTableToSJIS[key];
+    CodeData *p = m_HashTableToSJIS[key];
     while(p)
     {
         if (p->mbchar == c)
@@ -109,7 +109,7 @@ char* CharCodeConverter::UTF16BEtoSJIS(char *buffer, const wchar_t *utf16str)
 wchar_t CharCodeConverter::SJIStoUTF16BE(const uint32_t c)
 {
     const int32_t key = c % CharCodeConverter::MAX_HASH_TABLE;
-    CodeData *p = s_HashTableToUTF16[key];
+    CodeData *p = m_HashTableToUTF16[key];
     while(p)
     {
         if (p->mbchar == c)
