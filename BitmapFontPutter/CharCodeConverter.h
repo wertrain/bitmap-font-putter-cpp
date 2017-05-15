@@ -2,9 +2,9 @@
 #define CHARCODECONVERTER_H
 
 /**
-    * 文字コードを変換をします。
-    * 
-    */    
+ * 文字コードを変換をします。
+ * 
+ */
 class CharCodeConverter
 {
 public:
