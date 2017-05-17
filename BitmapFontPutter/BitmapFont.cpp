@@ -1,5 +1,4 @@
 ﻿#include <Windows.h>
-#include <string>
 #include <stdint.h>
 #include <algorithm>
 #include <fstream>
@@ -74,10 +73,10 @@ BitmapFont::~BitmapFont()
 {
 }
 
-bool BitmapFont::Create(const std::string& filename)
+bool BitmapFont::Create(const char* filename)
 {
     std::ifstream ifs;
-    ifs.open(filename.c_str(), std::ios::binary);
+    ifs.open(filename, std::ios::binary);
     assert(ifs);
     if (!ifs)
     {

@@ -18,7 +18,7 @@ public:
 public:
     BitmapFont();
     ~BitmapFont();
-    bool Create(const std::string& filename);
+    bool Create(const char* filename);
     void Destroy();
 
     uint32_t Draw(const HDC hdc);
