@@ -14,7 +14,7 @@ BitmapFont* bitmapFont = nullptr;
 bool Create(const HWND /*hWnd*/)
 {
     bitmapFont = new BitmapFont();
-    return bitmapFont->Create(".\\Resources\\sjis.bmp");;
+    return bitmapFont->Create(".\\Resources\\sjis.bmp");
 }
 
 /**
