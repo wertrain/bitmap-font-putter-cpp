@@ -6,15 +6,15 @@
 
 #include "..\..\BitmapFont.h"
 
-BitmapFont* bitmapFont = nullptr;
+BitmapFont* g_bitmapFont = nullptr;
 
 /**
 * create game object
 */
 bool Create(const HWND /*hWnd*/)
 {
-    bitmapFont = new BitmapFont();
-    return bitmapFont->Create(".\\Resources\\sjis.bmp");
+    g_bitmapFont = new BitmapFont();
+    return g_bitmapFont->Create(".\\Resources\\sjis.bmp");
 }
 
 /**
@@ -30,7 +30,7 @@ void Update(const DWORD /*nowTime*/)
 */
 void Draw(const HDC hDC)
 {
-    bitmapFont->Draw(hDC);
+    g_bitmapFont->Draw(hDC);
 }
 
 /**
@@ -38,6 +38,6 @@ void Draw(const HDC hDC)
 */
 void Destroy()
 {
-    bitmapFont->Destroy();
-    delete bitmapFont;
+    g_bitmapFont->Destroy();
+    delete g_bitmapFont;
 }
