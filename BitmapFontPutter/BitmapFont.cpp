@@ -47,7 +47,7 @@ uint8_t* GetBmpFileData(uint8_t* rawDataBuffer, uint32_t& bmpWidth, uint32_t& bm
     bmpHeight = bmp_info_header_ptr->biHeight;
     bitCount = bmp_info_header_ptr->biBitCount;
 
-    uint8_t* bmpDataBuffer = rawDataBuffer + bmp_file_header_ptr->bfOffBits;
+    uint8_t* bmpDataBuffer = rawDataBuffer + sizeof(BitmapFileHeader) + sizeof(BitmapInfoHeader);
 
     return bmpDataBuffer;
 }
