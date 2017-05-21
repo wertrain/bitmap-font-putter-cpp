@@ -32,7 +32,7 @@ bool CharCodeConverter::Initialize()
         data->mbchar = UTF16Table[i];
         data->index = i;
         
-        if(m_HashTableToSJIS[key] == NULL)
+        if(m_HashTableToSJIS[key] == nullptr)
             m_HashTableToSJIS[key] = data;
         else
         {
@@ -54,7 +54,7 @@ bool CharCodeConverter::Initialize()
         data->mbchar = SJISTable[i];
         data->index = i;
         
-        if(m_HashTableToUTF16[key] == NULL)
+        if(m_HashTableToUTF16[key] == nullptr)
             m_HashTableToUTF16[key] = data;
         else
         {
@@ -216,7 +216,7 @@ wchar_t* CharCodeConverter::UTF8toUTF16BE(wchar_t *buffer, int32_t bufferCount ,
         }
         ++count;
         if( count == bufferCount )
-            return NULL ;
+            return nullptr;
     }
     buffer[count] = 0x00;
     return buffer;
