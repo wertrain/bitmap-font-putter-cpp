@@ -41,5 +41,4 @@ void Destroy()
     g_bitmapFont->Destroy();
     delete g_bitmapFont;
     g_bitmapFont = nullptr;
-
 }
