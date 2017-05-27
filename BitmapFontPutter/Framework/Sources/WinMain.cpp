@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <time.h>
 #include <tchar.h>
-#include <mmsystem.h>
 #pragma comment (lib, "winmm.lib")
 
 #include "..\Headers\GameMain.h"
