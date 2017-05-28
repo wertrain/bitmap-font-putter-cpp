@@ -34,6 +34,7 @@ protected:
     uint8_t* m_pBmpPixelBuffer;
     uint32_t m_BmpWidth;
     uint32_t m_BmpHeight;
+    uint32_t m_BmpCharLizeSize;
 };
 
 #endif // BITMAPFONT_H

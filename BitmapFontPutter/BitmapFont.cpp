@@ -47,14 +47,15 @@ uint8_t* GetBmpFileData(uint8_t* rawDataBuffer, uint32_t& bmpWidth, uint32_t& bm
     bmpHeight = bmp_info_header_ptr->biHeight;
     bitCount = bmp_info_header_ptr->biBitCount;
 
+    uint32_t test = sizeof(BitmapFileHeader);
+    uint32_t a = sizeof(BitmapInfoHeader);
     uint8_t* bmpDataBuffer = rawDataBuffer + sizeof(BitmapFileHeader) + sizeof(BitmapInfoHeader);
 
     return bmpDataBuffer;
 }
 
 const uint32_t FONT_IMAGE_LINE_NUM = 94; // = 1 区画あたりの文字数
-const uint32_t FONT_CHAR_DATA_SIZE = BitmapFont::FONT_CHAR_WIDTH * BitmapFont::FONT_CHAR_HEIGHT * BitmapFont::FONT_BIT;
-const uint32_t FONT_CHAR_DATA_LINE_SIZE = FONT_CHAR_DATA_SIZE * FONT_IMAGE_LINE_NUM;
+const uint32_t FONT_CHAR_DATA_SIZE = BitmapFont::FONT_CHAR_WIDTH * BitmapFont::FONT_BIT;
 
 }
 
@@ -65,6 +66,7 @@ BitmapFont::BitmapFont()
     , m_pBmpPixelBuffer(nullptr)
     , m_BmpWidth(0)
     , m_BmpHeight(0)
+    , m_BmpCharLizeSize(0)
 {
 
 }
@@ -83,7 +85,7 @@ bool BitmapFont::Create(const char* filename)
         return false;
     }
 
-    //終端までシーク -> 現在位置を取得 = ファイルサイズを取得
+    // 終端までシーク -> 現在位置を取得 = ファイルサイズを取得
     ifs.seekg(0, std::ios::end);
     const size_t size = ifs.tellg();
     m_pBmpRawData = new uint8_t[size];
@@ -99,6 +101,9 @@ bool BitmapFont::Create(const char* filename)
     {
         return false;
     }
+
+    // ビットマップ一行分のサイズを求める
+    m_BmpCharLizeSize = (m_BmpWidth * BitmapFont::FONT_CHAR_HEIGHT * BitmapFont::FONT_BIT);
 
     return true;
 }
@@ -126,6 +131,53 @@ void BitmapFont::Destroy()
 
 uint32_t BitmapFont::Draw(const HDC hdc)
 {
+    int xx = 0, yy = 16;
+    for (int i = 0; i < 94; ++i)
+    {
+        // ビットマップデータにおける文字の位置を取得する
+        const uint32_t charPos = GetCharPos(0x21 + i);
+        // 半角スペースや判別不明文字の場合はここに入る
+        //if (charPos == 0)
+        //{
+        //	// 空白をもうけるために幅だけを返す
+        //	return BitmapFont::FONT_CHAR_WIDTH / 4;
+        //}
+        if (++xx > 16){
+            yy += 40;
+            xx = 0;
+        }
+        // 実際に描画する文字幅の最大・最小を取得する
+        uint32_t minWidth = 0;
+        uint32_t maxWidth = BitmapFont::FONT_CHAR_WIDTH;
+        //this->core->GetCharWidth(charPos, &minWidth, &maxWidth);
+
+        uint8_t* fontData = m_pBmpPixelBuffer + charPos;// +charPos;
+        uint8_t cpimt = 0;
+        for (int y = 0; y < BitmapFont::FONT_CHAR_HEIGHT; ++y)
+        {
+
+            for (int x = 0; x < BitmapFont::FONT_CHAR_WIDTH; ++x)
+                // 実際にピクセルが存在する範囲のみで描画を行う
+                //for (int j = minWidth; j < minWidth + maxWidth; ++j)
+            {
+                uint8_t* bmpDataPtr = fontData;
+                // 上下反転
+                //int test = BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
+                bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x) + 16;
+                //uint32_t aa = BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
+                // ピクセルデータ取得
+                uint8_t r = (*(bmpDataPtr + 1)), g = (*(bmpDataPtr + 2)), b = (*(bmpDataPtr + 3)), a = (*(bmpDataPtr + 0));
+                //const uint32_t color = (*fontData);
+                //uint8_t a = (color >> 24), r = (color >> 16 & 0xFF), g = (color >> 8 & 0xFF), b = (color & 0xFF);
+                if (a == 0) {
+                    SetPixel(hdc, 16 + x + (BitmapFont::FONT_CHAR_WIDTH * xx), y + yy + 16, RGB(255, 0, 0));
+                    continue;
+                }
+                SetPixel(hdc, 16 + x + (BitmapFont::FONT_CHAR_WIDTH * xx) ,y + yy + 16, RGB(r, g, b));
+            }
+            int ad = 0;
+        }
+    }
     return 0;
 }
 
@@ -148,10 +200,17 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
         charPos = 0;
     }
     // 半角文字
-    else if (c >= byteFirst && c <= byteLast)
+    else if (c >= byteSpace && c <= byteLast)
     {
-        charPos = (FONT_CHAR_DATA_LINE_SIZE * 42) + ((c - byteFirst) * FONT_CHAR_WIDTH * FONT_BIT);
+        // ビットマップ画像における半角スペースの開始位置（画像によって変わる）
+        const uint32_t BYTE_FIRST_START_POS = (m_BmpCharLizeSize * 328);
+        // 各文字の位置を計算
+        // ' ' [半角スペース] 基準ではなく、'!' [半角エクスクラメーション] 基準なのでオフセットを設ける
+        uint32_t offset = (c - byteFirst);
+        uint32_t lines = (offset + 1) / 16;
+        charPos = BYTE_FIRST_START_POS + FONT_CHAR_DATA_SIZE + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
     }
+#if 0
     // 半角カナ
     else if (c >= byteKanaFirst && c <= byteKanaLast)
     {
@@ -160,6 +219,7 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
     // マルチバイト
     else if (c >= multiFirst && c <= multiLast)
     {
+        //(m_BmpWidth * BitmapFont::FONT_CHAR_HEIGHT * BitmapFont::FONT_BIT) * (315 + i)
         uint32_t startOffset = (FONT_CHAR_DATA_LINE_SIZE * 40);
         uint32_t currentCheckCode = multiFirst;
 
@@ -201,6 +261,6 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
             }
         }
     }
-
+#endif
     return charPos;
 }
