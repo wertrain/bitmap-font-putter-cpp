@@ -132,7 +132,7 @@ void BitmapFont::Destroy()
 uint32_t BitmapFont::Draw(const HDC hdc)
 {
     int xx = 0, yy = 16;
-    for (int i = 0; i < 94; ++i)
+    for (int i = 0; i < FONT_IMAGE_LINE_NUM; ++i)
     {
         // ビットマップデータにおける文字の位置を取得する
         const uint32_t charPos = GetCharPos(0x21 + i);
