@@ -135,13 +135,13 @@ uint32_t BitmapFont::Draw(const HDC hdc)
     for (int i = 0; i < FONT_IMAGE_LINE_NUM; ++i)
     {
         // ビットマップデータにおける文字の位置を取得する
-        const uint32_t charPos = GetCharPos(0x21 + i);
+        const uint32_t charPos = GetCharPos(0x00A1 + i);
         // 半角スペースや判別不明文字の場合はここに入る
-        //if (charPos == 0)
-        //{
-        //	// 空白をもうけるために幅だけを返す
-        //	return BitmapFont::FONT_CHAR_WIDTH / 4;
-        //}
+        if (charPos == 0)
+        {
+        	// 空白をもうけるために幅だけを返す
+        	return BitmapFont::FONT_CHAR_WIDTH / 4;
+        }
         if (++xx > 16){
             yy += 40;
             xx = 0;
@@ -210,12 +210,21 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
         uint32_t lines = (offset + 1) / 16;
         charPos = BYTE_FIRST_START_POS + FONT_CHAR_DATA_SIZE + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
     }
-#if 0
     // 半角カナ
     else if (c >= byteKanaFirst && c <= byteKanaLast)
     {
-        charPos = (FONT_CHAR_DATA_LINE_SIZE * 41) + ((c - byteKanaFirst) * FONT_CHAR_WIDTH * FONT_BIT);
+        const uint32_t BYTE_FIRST_START_POS = (m_BmpCharLizeSize * 320);
+        // 各文字の位置を計算
+        // '｡' [半角句点] 基準なのでオフセットを設ける
+        uint32_t offset = (c - byteKanaFirst);
+        uint32_t lines = (offset + 1) / 16;
+        charPos = BYTE_FIRST_START_POS + FONT_CHAR_DATA_SIZE + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
     }
+    else
+    {
+        return 0;
+    }
+#if 0
     // マルチバイト
     else if (c >= multiFirst && c <= multiLast)
     {
