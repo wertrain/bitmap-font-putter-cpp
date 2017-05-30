@@ -132,10 +132,10 @@ void BitmapFont::Destroy()
 uint32_t BitmapFont::Draw(const HDC hdc)
 {
     int xx = 0, yy = 16;
-    for (int i = 0; i < FONT_IMAGE_LINE_NUM; ++i)
+    for (int i = 0; i < FONT_IMAGE_LINE_NUM * 2; ++i)
     {
         // ビットマップデータにおける文字の位置を取得する
-        const uint32_t charPos = GetCharPos(0x00A1 + i);
+        const uint32_t charPos = GetCharPos(0x8140 + i);
         // 半角スペースや判別不明文字の場合はここに入る
         if (charPos == 0)
         {
@@ -203,26 +203,30 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
     else if (c >= byteSpace && c <= byteLast)
     {
         // ビットマップ画像における半角スペースの開始位置（画像によって変わる）
-        const uint32_t BYTE_FIRST_START_POS = (m_BmpCharLizeSize * 328);
+        const uint32_t FIRST_START_POS = (m_BmpCharLizeSize * 328);
         // 各文字の位置を計算
         // ' ' [半角スペース] 基準ではなく、'!' [半角エクスクラメーション] 基準なのでオフセットを設ける
         uint32_t offset = (c - byteFirst);
         uint32_t lines = (offset + 1) / 16;
-        charPos = BYTE_FIRST_START_POS + FONT_CHAR_DATA_SIZE + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
+        charPos = FIRST_START_POS + FONT_CHAR_DATA_SIZE + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
     }
     // 半角カナ
     else if (c >= byteKanaFirst && c <= byteKanaLast)
     {
-        const uint32_t BYTE_FIRST_START_POS = (m_BmpCharLizeSize * 320);
+        const uint32_t FIRST_START_POS = (m_BmpCharLizeSize * 320);
         // 各文字の位置を計算
         // '｡' [半角句点] 基準なのでオフセットを設ける
         uint32_t offset = (c - byteKanaFirst);
         uint32_t lines = (offset + 1) / 16;
-        charPos = BYTE_FIRST_START_POS + FONT_CHAR_DATA_SIZE + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
+        charPos = FIRST_START_POS + FONT_CHAR_DATA_SIZE + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
     }
-    else
+    else if (c >= multiFirst && c <= multiLast)
     {
-        return 0;
+        const uint32_t FIRST_START_POS = (m_BmpCharLizeSize * 316);
+        // 各文字の位置を計算
+        uint32_t offset = (c - multiFirst);
+        uint32_t lines = (offset + 1) / 16;
+        charPos = FIRST_START_POS + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
     }
 #if 0
     // マルチバイト
