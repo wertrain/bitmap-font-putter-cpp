@@ -184,7 +184,7 @@ uint32_t BitmapFont::Draw(const HDC hdc)
 uint32_t BitmapFont::GetCharPos(const uint32_t c)
 {
     const uint32_t byteSpace = 0x0020;
-    const uint32_t byteFirst = 0x0021;
+    //const uint32_t byteFirst = 0x0021;
     const uint32_t byteLast = 0x007e;
     const uint32_t byteKanaFirst = 0x00A1;
     const uint32_t byteKanaLast = 0x00DF;
