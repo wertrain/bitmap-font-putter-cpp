@@ -163,7 +163,7 @@ uint32_t BitmapFont::Draw(const HDC hdc)
                 uint8_t* bmpDataPtr = fontData;
                 // 上下反転
                 //int test = BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
-                bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x) + 16;
+                bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x) + 32;
                 //uint32_t aa = BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
                 // ピクセルデータ取得
                 uint8_t r = (*(bmpDataPtr + 1)), g = (*(bmpDataPtr + 2)), b = (*(bmpDataPtr + 3)), a = (*(bmpDataPtr + 0));
@@ -184,7 +184,7 @@ uint32_t BitmapFont::Draw(const HDC hdc)
 uint32_t BitmapFont::GetCharPos(const uint32_t c)
 {
     const uint32_t byteSpace = 0x0020;
-    //const uint32_t byteFirst = 0x0021;
+    const uint32_t byteFirst = 0x0021;
     const uint32_t byteLast = 0x007e;
     const uint32_t byteKanaFirst = 0x00A1;
     const uint32_t byteKanaLast = 0x00DF;
@@ -226,7 +226,7 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
         // 各文字の位置を計算
         uint32_t offset = (c - multiFirst);
         uint32_t lines = (offset + 1) / 16;
-        charPos = FIRST_START_POS + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize);
+        charPos = FIRST_START_POS + (offset * FONT_CHAR_DATA_SIZE) - (lines * m_BmpCharLizeSize) - (lines * m_BmpWidth * FONT_BIT) + 24;
     }
 #if 0
     // マルチバイト
