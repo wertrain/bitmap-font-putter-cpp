@@ -1,5 +1,5 @@
-﻿#ifndef CHARCODECONVERTER_H
-#define CHARCODECONVERTER_H
+﻿#ifndef CHARCODECONVERTER_H_
+#define CHARCODECONVERTER_H_
 
 /**
  * 文字コードを変換をします。
@@ -73,4 +73,4 @@ private:
     CodeData m_DataToUTF16[CODE_TABLE_SIZE];
 };
 
-#endif // CHARCODECONVERTER_H
+#endif // CHARCODECONVERTER_H_
