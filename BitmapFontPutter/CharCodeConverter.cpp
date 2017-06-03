@@ -12,7 +12,11 @@ extern const uint32_t UTF16Table[CharCodeConverter::CODE_TABLE_SIZE];
 
 CharCodeConverter::CharCodeConverter()
 {
-
+    for (int32_t i = 0; i < MAX_HASH_TABLE; ++i)
+    {
+        m_HashTableToSJIS[i] = nullptr;
+        m_HashTableToUTF16[i] = nullptr;
+    }
 }
 
 CharCodeConverter::~CharCodeConverter()

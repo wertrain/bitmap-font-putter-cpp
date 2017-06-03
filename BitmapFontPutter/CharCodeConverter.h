@@ -61,8 +61,8 @@ private:
         CodeData *pNext;
 
         CodeData()
-            : mbchar(0),
-            pNext(NULL)
+            : mbchar(0)
+            , pNext(NULL)
         {}
     };
 
