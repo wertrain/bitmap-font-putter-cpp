@@ -55,8 +55,9 @@ uint8_t* GetBmpFileData(uint8_t* rawDataBuffer, uint32_t& bmpWidth, uint32_t& bm
     return bmpDataBuffer;
 }
 
-const uint32_t FONT_IMAGE_LINE_NUM = 94; // = 1 区画あたりの文字数
-const uint32_t FONT_CHAR_DATA_SIZE = BitmapFont::FONT_CHAR_WIDTH * BitmapFont::FONT_BIT;
+const uint32_t FONT_IMAGE_AREA_NUM = 94; // 1 区画あたりの文字数
+const uint32_t FONT_IMAGE_LINE_NUM = 16; // 1 行の文字数
+const uint32_t FONT_CHAR_DATA_SIZE = BitmapFont::FONT_CHAR_WIDTH * BitmapFont::FONT_BIT; // 一文字あたりの幅サイズ
 
 /**
  * 指定された引数をマルチバイト文字として扱います。
@@ -165,7 +166,7 @@ void BitmapFont::Destroy()
 uint32_t BitmapFont::Draw(const HDC hDC)
 {
     int xx = 0, yy = 16;
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < FONT_IMAGE_AREA_NUM; ++i)
     {
         // ビットマップデータにおける文字の位置を取得する
         const uint32_t charPos = GetCharPos(0x8175 + i);
@@ -238,12 +239,12 @@ uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t 
             uint8_t* bmpDataPtr = fontData;
             // 上下反転
             bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - py) + px);
-            // ピクセルデータ取得
+            // ピクセルデータ取得（ARGBの順番を想定）
             uint8_t r = (*(bmpDataPtr + 1)), g = (*(bmpDataPtr + 2)), b = (*(bmpDataPtr + 3)), a = (*(bmpDataPtr + 0));
             if (a == 0) continue;
             // アルファを反映させるっぽい計算
-            uint32_t avg = (r + g + b) / 3;
-            uint32_t color = avg + (255 - a);
+            const uint32_t avg = (r + g + b) / 3;
+            const uint32_t color = avg + (255 - a);
             SetPixel(hDC, x + px, y + py, RGB(color, color, color));
         }
     }
@@ -285,8 +286,7 @@ void BitmapFont::DrawString(const HDC hDC, const int32_t x, const int32_t y, con
 
 bool BitmapFont::GetCharWidth(const uint32_t charPos, int32_t *minWidth, int32_t *maxWidth)
 {
-    *minWidth = BitmapFont::FONT_CHAR_WIDTH;
-    *maxWidth = 0;
+    int32_t min = BitmapFont::FONT_CHAR_WIDTH, max = 0;
 
     uint8_t* fontData = m_pBmpPixelBuffer + charPos;
     for (int py = 0; py < BitmapFont::FONT_CHAR_HEIGHT; ++py)
@@ -296,13 +296,20 @@ bool BitmapFont::GetCharWidth(const uint32_t charPos, int32_t *minWidth, int32_t
             uint8_t* bmpDataPtr = fontData;
             // 上下反転
             bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - py) + px);
-            // ピクセルデータ取得
+            // ピクセルデータ取得（ARGBの順番を想定）
             uint8_t a = (*(bmpDataPtr + 0));
             if (a == 0) continue;
-            *minWidth = std::min<int32_t>(px, *minWidth);
-            *maxWidth = std::max<int32_t>(px, *maxWidth);
+            min = std::min<int32_t>(px, min);
+            max = std::max<int32_t>(px, max);
         }
     }
+
+    if (min != BitmapFont::FONT_CHAR_WIDTH && max != 0)
+    {
+        *minWidth = min;
+        *maxWidth = max + 1;
+    }
+
     return true;
 }
 
@@ -311,8 +318,10 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
     const uint32_t HANKAKU_SPACE = 0x0020; 
     const uint32_t ZENKAKU_SPACE = 0x8140;
     const uint32_t LIST_SIZE = 5;
+    // 区画ごとにずれるので、適当な位置の先頭と終端の文字コードを配列で持つ
     const uint32_t CODE_START_LIST[LIST_SIZE] = { 0x0020, 0x00A0, 0x8140, 0x8740, 0x8890 };
     const uint32_t CODE_LAST_LIST[LIST_SIZE] = { 0x00DF, 0x00DF, 0x84BF, 0x879F, 0x987F };
+    // 上の配列で持つ文字コードは、画像データ中で下から何番目の位置にあるかの配列（画像によって要調整）
     const uint32_t ON_BITMAP_POS_LIST[LIST_SIZE] = { 328, 320, 316, 284, 254 };
 
     // 文字のデータ位置
@@ -332,13 +341,12 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
             {
                 const uint32_t FIRST_START_POS = (m_BmpCharLizeSize * ON_BITMAP_POS_LIST[i]) + 16;
                 // 各文字の位置を計算
-                uint32_t offset = (c - CODE_START_LIST[i]) - 1;
-                uint32_t lines = (offset + 1) / 16;
-                uint32_t charoffset = (offset + 1) % 16;
-                charPos = FIRST_START_POS - (m_BmpCharLizeSize * lines) - ((16 - charoffset) * FONT_CHAR_DATA_SIZE);
+                uint32_t offset = (c - CODE_START_LIST[i]);
+                uint32_t lines = offset / FONT_IMAGE_LINE_NUM; // 何列目？
+                uint32_t number = offset % FONT_IMAGE_LINE_NUM; // 何番目？
+                charPos = FIRST_START_POS - (m_BmpCharLizeSize * lines) - ((FONT_IMAGE_LINE_NUM - number) * FONT_CHAR_DATA_SIZE);
             }
         }
-
     }
     return charPos;
 }
