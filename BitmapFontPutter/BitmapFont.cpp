@@ -165,10 +165,10 @@ void BitmapFont::Destroy()
 uint32_t BitmapFont::Draw(const HDC hDC)
 {
     int xx = 0, yy = 16;
-    for (int i = 0; i < FONT_IMAGE_LINE_NUM * 2; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         // ビットマップデータにおける文字の位置を取得する
-        const uint32_t charPos = GetCharPos(0x82A0 + i);
+        const uint32_t charPos = GetCharPos(0x8175 + i);
         // 半角スペースや判別不明文字の場合はここに入る
         if (charPos == 0)
         {
@@ -199,10 +199,10 @@ uint32_t BitmapFont::Draw(const HDC hDC)
                 //const uint32_t color = (*fontData);
                 //uint8_t a = (color >> 24), r = (color >> 16 & 0xFF), g = (color >> 8 & 0xFF), b = (color & 0xFF);
                 if (a == 0) {
-                    SetPixel(hDC, x + (BitmapFont::FONT_CHAR_WIDTH * xx) + i + 120, y + yy + 120, RGB(255, 0, 0));
+                    SetPixel(hDC, x + (BitmapFont::FONT_CHAR_WIDTH * xx) + i + 32, y + yy + 32, RGB(255, 0, 0));
                     continue;
                 }
-                SetPixel(hDC,  x + (BitmapFont::FONT_CHAR_WIDTH * xx) + i + 120,y + yy + 120, RGB(r, g, b));
+                SetPixel(hDC,  x + (BitmapFont::FONT_CHAR_WIDTH * xx) + i + 32,y + yy + 32, RGB(r, g, b));
             }
         }
         if (++xx >= 16) {
@@ -233,7 +233,7 @@ uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t 
     for (int py = 0; py < BitmapFont::FONT_CHAR_HEIGHT; ++py)
     {
         // 実際にピクセルが存在する範囲のみで描画を行う
-        for (int px = minWidth; px < minWidth + maxWidth; ++px)
+        for (int px = minWidth; px < maxWidth; ++px)
         {
             uint8_t* bmpDataPtr = fontData;
             // 上下反転
@@ -241,7 +241,10 @@ uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t 
             // ピクセルデータ取得
             uint8_t r = (*(bmpDataPtr + 1)), g = (*(bmpDataPtr + 2)), b = (*(bmpDataPtr + 3)), a = (*(bmpDataPtr + 0));
             if (a == 0) continue;
-            SetPixel(hDC, x + px, y + py, RGB(r, g, b));
+            // アルファを反映させるっぽい計算
+            uint32_t avg = (r + g + b) / 3;
+            uint32_t color = avg + (255 - a);
+            SetPixel(hDC, x + px, y + py, RGB(color, color, color));
         }
     }
     return maxWidth;
@@ -294,9 +297,8 @@ bool BitmapFont::GetCharWidth(const uint32_t charPos, int32_t *minWidth, int32_t
             // 上下反転
             bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - py) + px);
             // ピクセルデータ取得
-            uint8_t r = (*(bmpDataPtr + 1)), g = (*(bmpDataPtr + 2)), b = (*(bmpDataPtr + 3)), a = (*(bmpDataPtr + 0));
+            uint8_t a = (*(bmpDataPtr + 0));
             if (a == 0) continue;
-            
             *minWidth = std::min<int32_t>(px, *minWidth);
             *maxWidth = std::max<int32_t>(px, *maxWidth);
         }
@@ -306,99 +308,37 @@ bool BitmapFont::GetCharWidth(const uint32_t charPos, int32_t *minWidth, int32_t
 
 uint32_t BitmapFont::GetCharPos(const uint32_t c)
 {
-    const uint32_t hankakuSpace = 0x0020; 
-    const uint32_t zenkakuSpace = 0x8140;
-    const uint32_t byteFirst = 0x0020;
-    const uint32_t byteLast = 0x007e;
-    const uint32_t byteKanaFirst = 0x00A0;
-    const uint32_t byteKanaLast = 0x00DF;
-    const uint32_t multiFirst = 0x8140;
-    const uint32_t multiLast = 0xCFD3;
+    const uint32_t HANKAKU_SPACE = 0x0020; 
+    const uint32_t ZENKAKU_SPACE = 0x8140;
+    const uint32_t LIST_SIZE = 5;
+    const uint32_t CODE_START_LIST[LIST_SIZE] = { 0x0020, 0x00A0, 0x8140, 0x8740, 0x8890 };
+    const uint32_t CODE_LAST_LIST[LIST_SIZE] = { 0x00DF, 0x00DF, 0x84BF, 0x879F, 0x987F };
+    const uint32_t ON_BITMAP_POS_LIST[LIST_SIZE] = { 328, 320, 316, 284, 254 };
 
     // 文字のデータ位置
     uint32_t charPos = 0;
 
     // 半角スペース or 全角スペース
-    if (hankakuSpace == c || zenkakuSpace == c)
+    if (HANKAKU_SPACE == c || ZENKAKU_SPACE == c)
     {
         return 0;
     }
-    // 半角文字
-    else if (c >= byteFirst && c <= byteLast)
+    else
     {
-        const uint32_t FIRST_START_POS = (m_BmpCharLizeSize * 328) + 16;
-        // 各文字の位置を計算
-        uint32_t offset = (c - byteFirst) - 1;
-        uint32_t lines = (offset + 1) / 16;
-        uint32_t charoffset = (offset + 1) % 16;
-        charPos = FIRST_START_POS - (m_BmpCharLizeSize * lines) - ((16 - charoffset) * FONT_CHAR_DATA_SIZE);
-    }
-    // 半角カナ
-    else if (c >= byteKanaFirst && c <= byteKanaLast)
-    {
-        const uint32_t FIRST_START_POS = (m_BmpCharLizeSize * 320) + 16;
-        
-        uint32_t offset = (c - byteKanaFirst) - 1;
-        uint32_t lines = (offset + 1) / 16;
-        uint32_t charoffset = (offset + 1) % 16;
-        charPos = FIRST_START_POS - (m_BmpCharLizeSize * lines) - ((16 - charoffset) * FONT_CHAR_DATA_SIZE);
-    }
-    // 全角文字
-    else if (c >= multiFirst && c <= multiLast)
-    {
-        const uint32_t FIRST_START_POS = (m_BmpCharLizeSize * 316) + 16;
-
-        uint32_t offset = (c - multiFirst) - 1;
-        uint32_t lines = (offset + 1) / 16;
-        uint32_t charoffset = (offset + 1) % 16;
-        charPos = FIRST_START_POS - (m_BmpCharLizeSize * lines) - ((16 - charoffset) * FONT_CHAR_DATA_SIZE);
-    }
-#if 0
-    // マルチバイト
-    else if (c >= multiFirst && c <= multiLast)
-    {
-        //(m_BmpWidth * BitmapFont::FONT_CHAR_HEIGHT * BitmapFont::FONT_BIT) * (315 + i)
-        uint32_t startOffset = (FONT_CHAR_DATA_LINE_SIZE * 40);
-        uint32_t currentCheckCode = multiFirst;
-
-        // 区画を決定する、第一水準までなので全部で47区画
-        for (uint32_t k = 0; k < 47; ++k)
+        // 位置ごとにテーブルから画像アドレスを計算する
+        for (int i = 0; i < LIST_SIZE; ++i)
         {
-            // 偶数区画は95、奇数区画は161増えていく
-            const bool even = ((k + 1) % 2) == 0;
-            uint32_t add = (even ? 161 : 95);
-
-            // 区画の末尾とチェック
-            if (c < currentCheckCode + add)
+            if (c >= CODE_START_LIST[i] && c <= CODE_LAST_LIST[i])
             {
-                uint32_t shift = 0;
-                // 区画によってずれる位置があるので修正
-                // 奇数区画の63番目以降の文字は一つずれる
-                if (!even && currentCheckCode + 63 < c)
-                    shift = -1;
-
-                // 9区画目から12画目まで空行
-                uint32_t empty1 = std::max<uint32_t>(k - 8, 0);
-                empty1 = std::min<uint32_t>(empty1, 4);
-
-                // 14区画目から15画目まで空行
-                uint32_t empty2 = std::max<uint32_t>(k - 13, 0);
-                empty2 = std::min<uint32_t>(empty2, 2);
-
-                // 飛ばす行を一括計算
-                uint32_t emptyOffset = ((empty1 + empty2) * FONT_CHAR_DATA_LINE_SIZE);
-
-                // 文字の開始位置を計算
-                charPos = (startOffset - (k * FONT_CHAR_DATA_LINE_SIZE)) + emptyOffset
-                    + ((c - currentCheckCode + shift) * FONT_CHAR_WIDTH * FONT_BIT);
-                break;
-            }
-            else
-            {
-                currentCheckCode += add;
+                const uint32_t FIRST_START_POS = (m_BmpCharLizeSize * ON_BITMAP_POS_LIST[i]) + 16;
+                // 各文字の位置を計算
+                uint32_t offset = (c - CODE_START_LIST[i]) - 1;
+                uint32_t lines = (offset + 1) / 16;
+                uint32_t charoffset = (offset + 1) % 16;
+                charPos = FIRST_START_POS - (m_BmpCharLizeSize * lines) - ((16 - charoffset) * FONT_CHAR_DATA_SIZE);
             }
         }
+
     }
-#endif
     return charPos;
 }
