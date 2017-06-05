@@ -79,9 +79,7 @@ bool IsLeadByteSJIS(int32_t c) { return ((((unsigned)(c) ^ 0x20U) - 0xA1U) < (un
 }
 
 BitmapFont::BitmapFont()
-    : m_hBmpData(NULL)
-    , m_hMemdc(NULL)
-    , m_pBmpRawData(nullptr)
+    : m_pBmpRawData(nullptr)
     , m_pBmpPixelBuffer(nullptr)
     , m_BmpWidth(0)
     , m_BmpHeight(0)
@@ -141,18 +139,6 @@ void BitmapFont::Destroy()
     {
         delete[] m_pBmpRawData;
         m_pBmpRawData = nullptr;
-    }
-
-    if (m_hMemdc)
-    {
-        DeleteDC(m_hMemdc);
-        m_hMemdc = NULL;
-    }
-    
-    if (m_hBmpData)
-    {
-        DeleteObject(m_hBmpData);
-        m_hBmpData = NULL;
     }
 
     if (m_CharCodeConverter != nullptr)
