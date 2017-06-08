@@ -23,7 +23,6 @@ public:
     bool Create(const char* filename);
     void Destroy();
 
-    uint32_t Draw(const HDC hDC);
     uint32_t DrawSJISChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c);
     void DrawSJISString(const HDC hDC, const int32_t x, const int32_t y, const char* str);
     uint32_t DrawChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c);

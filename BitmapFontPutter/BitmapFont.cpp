@@ -149,57 +149,6 @@ void BitmapFont::Destroy()
     }
 }
 
-uint32_t BitmapFont::Draw(const HDC hDC)
-{
-    int xx = 0, yy = 16;
-    for (int i = 0; i < FONT_IMAGE_AREA_NUM; ++i)
-    {
-        // ビットマップデータにおける文字の位置を取得する
-        const uint32_t charPos = GetCharPos(0x8175 + i);
-        // 半角スペースや判別不明文字の場合はここに入る
-        if (charPos == 0)
-        {
-        	// 空白をもうけるために幅だけを返す
-            continue;
-        }
-        // 実際に描画する文字幅の最大・最小を取得する
-        uint32_t minWidth = 0;
-        uint32_t maxWidth = BitmapFont::FONT_CHAR_WIDTH;
-        //this->core->GetCharWidth(charPos, &minWidth, &maxWidth);
-
-        uint8_t* fontData = m_pBmpPixelBuffer + charPos;// +charPos;
-        uint8_t cpimt = 0;
-        for (int y = 0; y < BitmapFont::FONT_CHAR_HEIGHT; ++y)
-        {
-
-            for (int x = 0; x < BitmapFont::FONT_CHAR_WIDTH; ++x)
-                // 実際にピクセルが存在する範囲のみで描画を行う
-                //for (int j = minWidth; j < minWidth + maxWidth; ++j)
-            {
-                uint8_t* bmpDataPtr = fontData;
-                // 上下反転
-                //int test = BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
-                bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
-                //uint32_t aa = BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - y) + x);
-                // ピクセルデータ取得
-                uint8_t r = (*(bmpDataPtr + 1)), g = (*(bmpDataPtr + 2)), b = (*(bmpDataPtr + 3)), a = (*(bmpDataPtr + 0));
-                //const uint32_t color = (*fontData);
-                //uint8_t a = (color >> 24), r = (color >> 16 & 0xFF), g = (color >> 8 & 0xFF), b = (color & 0xFF);
-                if (a == 0) {
-                    SetPixel(hDC, x + (BitmapFont::FONT_CHAR_WIDTH * xx) + i + 32, y + yy + 32, RGB(255, 0, 0));
-                    continue;
-                }
-                SetPixel(hDC,  x + (BitmapFont::FONT_CHAR_WIDTH * xx) + i + 32,y + yy + 32, RGB(r, g, b));
-            }
-        }
-        if (++xx >= 16) {
-            yy += 40;
-            xx = 0;
-        }
-    }
-    return 0;
-}
-
 uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c)
 {
     // ビットマップデータにおける文字の位置を取得する
