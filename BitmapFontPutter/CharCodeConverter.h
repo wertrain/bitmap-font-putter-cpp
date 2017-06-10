@@ -2,7 +2,7 @@
 #define CHARCODECONVERTER_H_
 
 /**
- * 文字コードを変換をします。
+ * 文字コード変換クラス
  * 
  */
 class CharCodeConverter

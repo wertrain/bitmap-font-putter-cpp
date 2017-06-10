@@ -4,7 +4,7 @@
 class CharCodeConverter;
 
 /**
- * Bitmapでフォント画像を管理するクラス
+ * Bitmapを読み込みフォント画像を描画するクラス
  *
  */
 class BitmapFont
