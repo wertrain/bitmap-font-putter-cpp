@@ -38,6 +38,7 @@ protected:
     uint32_t m_BmpWidth;
     uint32_t m_BmpHeight;
     uint32_t m_BmpCharLizeSize;
+    uint32_t m_Color;
     CharCodeConverter* m_CharCodeConverter;
 };
 

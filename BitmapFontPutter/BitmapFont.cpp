@@ -85,6 +85,7 @@ BitmapFont::BitmapFont()
     , m_BmpHeight(0)
     , m_BmpCharLizeSize(0)
     , m_CharCodeConverter(nullptr)
+    , m_Color(0)
 {
 
 }
