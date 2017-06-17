@@ -167,10 +167,10 @@ uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t 
     GetCharWidth(charPos, &minWidth, &maxWidth);
 
     uint8_t* fontData = m_pBmpPixelBuffer + charPos;
-    for (int py = 0; py < BitmapFont::FONT_CHAR_HEIGHT; ++py)
+    for (int32_t py = 0; py < BitmapFont::FONT_CHAR_HEIGHT; ++py)
     {
         // 実際にピクセルが存在する範囲のみで描画を行う
-        for (int px = minWidth; px < maxWidth; ++px)
+        for (int32_t px = minWidth; px < maxWidth; ++px)
         {
             uint8_t* bmpDataPtr = fontData;
             // 上下反転
@@ -225,9 +225,9 @@ bool BitmapFont::GetCharWidth(const uint32_t charPos, int32_t *minWidth, int32_t
     int32_t min = BitmapFont::FONT_CHAR_WIDTH, max = 0;
 
     uint8_t* fontData = m_pBmpPixelBuffer + charPos;
-    for (int py = 0; py < BitmapFont::FONT_CHAR_HEIGHT; ++py)
+    for (int32_t py = 0; py < BitmapFont::FONT_CHAR_HEIGHT; ++py)
     {
-        for (int px = 0; px < BitmapFont::FONT_CHAR_WIDTH; ++px)
+        for (int32_t px = 0; px < BitmapFont::FONT_CHAR_WIDTH; ++px)
         {
             uint8_t* bmpDataPtr = fontData;
             // 上下反転
@@ -271,7 +271,7 @@ uint32_t BitmapFont::GetCharPos(const uint32_t c)
     else
     {
         // 位置ごとにテーブルから画像アドレスを計算する
-        for (int i = 0; i < LIST_SIZE; ++i)
+        for (int32_t i = 0; i < LIST_SIZE; ++i)
         {
             if (c >= CODE_START_LIST[i] && c <= CODE_LAST_LIST[i])
             {
