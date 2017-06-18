@@ -181,12 +181,13 @@ uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t 
 
             // アルファを反映させるっぽい計算
             const uint32_t avg = (bitmapR + bitmapG + bitmapB) / 3;
-            const uint32_t color = avg + (255 - bitmapA);
+            const uint32_t bitmapInvA = (255 - bitmapA);
+            const uint32_t color = avg + bitmapInvA;
             const float fColor = 1.0f - static_cast<float>(color) / 255.0f;
             const uint8_t inputR = (m_Color >> 0 & 0xFF), inputG = (m_Color >> 8 & 0xFF), inputB = (m_Color >> 16 & 0xFF); // 標準の RGB マクロ用の展開
-            const uint8_t r = static_cast<uint8_t>(inputR * fColor) + (255 - bitmapA),
-                          g = static_cast<uint8_t>(inputG * fColor) + (255 - bitmapA),
-                          b = static_cast<uint8_t>(inputB * fColor) + (255 - bitmapA);
+            const uint8_t r = static_cast<uint8_t>(inputR * fColor) + bitmapInvA,
+                          g = static_cast<uint8_t>(inputG * fColor) + bitmapInvA,
+                          b = static_cast<uint8_t>(inputB * fColor) + bitmapInvA;
             SetPixel(hDC, x + px, y + py, RGB(r, g, b));
         }
     }
