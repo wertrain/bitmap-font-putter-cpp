@@ -176,12 +176,18 @@ uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t 
             // 上下反転
             bmpDataPtr += BitmapFont::FONT_BIT * (m_BmpWidth * (BitmapFont::FONT_CHAR_HEIGHT - py) + px);
             // ピクセルデータ取得（ARGBの順番を想定）
-            uint8_t r = (*(bmpDataPtr + 1)), g = (*(bmpDataPtr + 2)), b = (*(bmpDataPtr + 3)), a = (*(bmpDataPtr + 0));
-            if (a == 0) continue;
+            uint8_t bitmapR = (*(bmpDataPtr + 1)), bitmapG = (*(bmpDataPtr + 2)), bitmapB = (*(bmpDataPtr + 3)), bitmapA = (*(bmpDataPtr + 0));
+            if (bitmapA == 0) continue;
+
             // アルファを反映させるっぽい計算
-            const uint32_t avg = (r + g + b) / 3;
-            const uint32_t color = avg + (255 - a);
-            SetPixel(hDC, x + px, y + py, RGB(color, color, color));
+            const uint32_t avg = (bitmapR + bitmapG + bitmapB) / 3;
+            const uint32_t color = avg + (255 - bitmapA);
+            const float fColor = 1.0f - static_cast<float>(color) / 255.0f;
+            const uint8_t inputR = (m_Color >> 0 & 0xFF), inputG = (m_Color >> 8 & 0xFF), inputB = (m_Color >> 16 & 0xFF); // 標準の RGB マクロ用の展開
+            const uint8_t r = static_cast<uint8_t>(inputR * fColor) + (255 - bitmapA),
+                          g = static_cast<uint8_t>(inputG * fColor) + (255 - bitmapA),
+                          b = static_cast<uint8_t>(inputB * fColor) + (255 - bitmapA);
+            SetPixel(hDC, x + px, y + py, RGB(r, g, b));
         }
     }
     return maxWidth;
@@ -218,6 +224,11 @@ void BitmapFont::DrawString(const HDC hDC, const int32_t x, const int32_t y, con
         posX += DrawChar(hDC, posX, posY, (*ptr));
         ++ptr;
     }
+}
+
+void BitmapFont::SetColor(const uint8_t r, const uint8_t g, const uint8_t b)
+{
+    m_Color = RGB(r, g, b);
 }
 
 bool BitmapFont::GetCharWidth(const uint32_t charPos, int32_t *minWidth, int32_t *maxWidth)

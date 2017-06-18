@@ -28,6 +28,8 @@ public:
     uint32_t DrawChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c);
     void DrawString(const HDC hDC, const int32_t x, const int32_t y, const wchar_t* str);
 
+    void SetColor(const uint8_t r, const uint8_t g, const uint8_t b);
+
 protected:
     bool GetCharWidth(const uint32_t charPos, int32_t *minWidth, int32_t *maxWidth);
     uint32_t GetCharPos(const uint32_t c);
