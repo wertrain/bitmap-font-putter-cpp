@@ -23,11 +23,25 @@ public:
     bool Create(const char* filename);
     void Destroy();
 
+    /**
+     * Shift-JIS コードを指定し文字を描画します。
+     */
     uint32_t DrawSJISChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c);
+    /**
+     * Shift-JIS コードを指定し文字列を描画します。
+     */
     void DrawSJISString(const HDC hDC, const int32_t x, const int32_t y, const char* str);
+    /**
+     * Unicode を指定し文字を描画します。
+     */
     uint32_t DrawChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c);
+    /**
+     * Unicode を指定し文字列を描画します。
+     */
     void DrawString(const HDC hDC, const int32_t x, const int32_t y, const wchar_t* str);
-
+    /**
+     * 表示色を設定します。
+     */
     void SetColor(const uint8_t r, const uint8_t g, const uint8_t b);
 
 protected:
