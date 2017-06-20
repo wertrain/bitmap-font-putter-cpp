@@ -25,22 +25,43 @@ public:
 
     /**
      * Shift-JIS コードを指定し文字を描画します。
+     * @param hDC デバイスコンテキスト
+     * @param x 表示位置X
+     * @param y 表示位置Y
+     * @param c Shift-JIS 文字
+     * @return 描画文字幅
      */
     uint32_t DrawSJISChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c);
     /**
      * Shift-JIS コードを指定し文字列を描画します。
+     * @param hDC デバイスコンテキスト
+     * @param x 表示位置X
+     * @param y 表示位置Y
+     * @param str Shift-JIS 文字列
      */
     void DrawSJISString(const HDC hDC, const int32_t x, const int32_t y, const char* str);
     /**
      * Unicode を指定し文字を描画します。
+     * @param hDC デバイスコンテキスト
+     * @param x 表示位置X
+     * @param y 表示位置Y
+     * @param c Unicode 文字
+     * @return 描画文字幅
      */
     uint32_t DrawChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c);
     /**
      * Unicode を指定し文字列を描画します。
+     * @param hDC デバイスコンテキスト
+     * @param x 表示位置X
+     * @param y 表示位置Y
+     * @param str Unicode 文字列
      */
     void DrawString(const HDC hDC, const int32_t x, const int32_t y, const wchar_t* str);
     /**
-     * 表示色を設定します。
+     * 文字色を設定します。
+     * @param r 赤成分
+     * @param g 緑成分
+     * @param b 青成分
      */
     void SetColor(const uint8_t r, const uint8_t g, const uint8_t b);
 
