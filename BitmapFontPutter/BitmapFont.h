@@ -24,20 +24,20 @@ public:
     void Destroy();
 
     /**
-     * Shift-JIS コードを指定し文字を描画します。
+     * Shift_JIS コードを指定し文字を描画します。
      * @param hDC デバイスコンテキスト
      * @param x 表示位置X
      * @param y 表示位置Y
-     * @param c Shift-JIS 文字
+     * @param c Shift_JIS 文字
      * @return 描画文字幅
      */
     uint32_t DrawSJISChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c);
     /**
-     * Shift-JIS コードを指定し文字列を描画します。
+     * Shift_JIS コードを指定し文字列を描画します。
      * @param hDC デバイスコンテキスト
      * @param x 表示位置X
      * @param y 表示位置Y
-     * @param str Shift-JIS 文字列
+     * @param str Shift_JIS 文字列
      */
     void DrawSJISString(const HDC hDC, const int32_t x, const int32_t y, const char* str);
     /**
