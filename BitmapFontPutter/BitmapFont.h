@@ -20,9 +20,18 @@ public:
 public:
     BitmapFont();
     ~BitmapFont();
-    bool Create(const char* filename);
-    void Destroy();
 
+    /**
+     * 作成します。
+     * @param 表示する画像パス。
+     * @return 成功/失敗
+     */
+    bool Create(const char* filename);
+    /**
+     * 破棄します。
+     *
+     */
+    void Destroy();
     /**
      * Shift_JIS コードを指定し文字を描画します。
      * @param hDC デバイスコンテキスト
