@@ -14,38 +14,49 @@ public:
     void Finalize();
 
     /**
-     * 文字 UTF-16 BE を SJIS に変換します。
-     * 
+     * 文字 UTF-16 BE を Shift_JIS に変換します。
+     * @param c Shift_JIS 文字コード
+     * @return UTF-16 BE 文字コード
      */
     uint32_t UTF16BEtoSJIS(const uint32_t c);
 
     /**
-     * 文字列 UTF-16 BE を SJIS に変換します。
-     * 
+     * 文字列 UTF-16 BE を Shift_JIS に変換します。
+     * @param buffer 書き込み先バッファ
+     * @param utf16str 変換元 UTF-16 BE 文字列
+     * @return 書き込みへのポインタ
      */
     char* UTF16BEtoSJIS(char *buffer, const wchar_t *utf16str);
 
     /**
-     * 文字 SJIS を UTF-16 BE に変換します。
-     * 
+     * 文字 Shift_JIS を UTF-16 BE に変換します。
+     * @param c UTF-16 BE 文字コード
+     * @return Shift_JIS 文字コード
      */
     wchar_t SJIStoUTF16BE(const uint32_t c);
 
     /**
-     * 文字列 SJIS を UTF-16 BE に変換します。
-     * 
+     * 文字列 Shift_JIS を UTF-16 BE に変換します。
+     * @param buffer 書き込み先バッファ
+     * @param sjis 変換元 Shift_JIS 文字列
+     * @return 書き込みへのポインタ
      */
     wchar_t *SJIStoUTF16BE(wchar_t *buffer, const char *sjis);
 
     /**
      * 文字列 UTF-8 を UTF-16 BE に変換します。
-     * 
+     * @param buffer 書き込み先バッファ
+     * @param utf8str 変換元 UTF-16 BE 文字列
+     * @return 書き込みへのポインタ
      */
     wchar_t* UTF8toUTF16BE(wchar_t *buffer, const char *utf8str);
 
     /**
      * 文字列 UTF-8 を UTF-16 BE に変換します。
-     * 
+     * @param buffer 書き込み先バッファ
+     * @param bufferCount 書き込み先バッファサイズ
+     * @param utf8str 変換元 UTF-16 BE 文字列
+     * @return 書き込みへのポインタ
      */
     wchar_t* UTF8toUTF16BE(wchar_t *buffer, int32_t bufferCount , const char *utf8str);
 
