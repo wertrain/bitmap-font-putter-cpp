@@ -12,10 +12,10 @@ BitmapFont* g_bitmapFont = nullptr;
 /**
  * create game object
  */
-bool Create(const HWND /*hWnd*/)
+bool Create(const HWND hWnd)
 {
     g_bitmapFont = new BitmapFont();
-    if (!g_bitmapFont->Create(".\\Resources\\sjis.bmp"))
+    if (!g_bitmapFont->Create(hWnd, ".\\Resources\\sjis.bmp"))
         return false;
     return true;
 }
