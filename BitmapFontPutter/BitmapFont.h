@@ -28,6 +28,12 @@ public:
      */
     bool Create(const char* filename);
     /**
+    * 作成します。
+    * @param 表示する画像パス。
+    * @return 成功/失敗
+    */
+    bool Create(HWND hWnd, const char* filename);
+    /**
      * 破棄します。
      *
      */
@@ -86,6 +92,9 @@ protected:
     uint32_t m_BmpCharLizeSize;
     uint32_t m_Color;
     CharCodeConverter* m_CharCodeConverter;
+
+    HBITMAP m_hScreenBitmap;
+    HDC m_hScreenDeviceContext;
 };
 
 #endif // BITMAPFONT_H_

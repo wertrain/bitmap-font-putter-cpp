@@ -8,6 +8,7 @@
 
 #include "CharCodeConverter.h"
 #include "BitmapFont.h"
+#include "Framework/Headers/Constants.h"
 
 namespace
 {
@@ -86,6 +87,8 @@ BitmapFont::BitmapFont()
     , m_BmpCharLizeSize(0)
     , m_CharCodeConverter(nullptr)
     , m_Color(0)
+    , m_hScreenBitmap(NULL)
+    , m_hScreenDeviceContext(NULL)
 {
 
 }
@@ -134,8 +137,40 @@ bool BitmapFont::Create(const char* filename)
     return true;
 }
 
+bool BitmapFont::Create(HWND hWnd, const char* filename)
+{
+    if (!Create(filename)) return false;
+
+    HDC hdc = GetDC(hWnd);
+
+    // 画面サイズ分の互換ビットマップを作成
+    m_hScreenBitmap = CreateCompatibleBitmap(hdc, Framework::Constants::WIDTH, Framework::Constants::HEIGHT);
+    m_hScreenDeviceContext = CreateCompatibleDC(hdc);
+
+    SelectObject(m_hScreenDeviceContext, m_hScreenBitmap);
+    SelectObject(m_hScreenDeviceContext, GetStockObject(NULL_PEN));
+
+    PatBlt(m_hScreenDeviceContext, 0, 0, Framework::Constants::WIDTH, Framework::Constants::HEIGHT, WHITENESS);
+
+    ReleaseDC(hWnd, hdc);
+
+    return true;
+}
+
 void BitmapFont::Destroy()
 {
+    if (m_hScreenDeviceContext)
+    {
+        DeleteDC(m_hScreenDeviceContext);
+        m_hScreenDeviceContext = NULL;
+    }
+
+    if (m_hScreenBitmap)
+    {
+        DeleteObject(m_hScreenBitmap);
+        m_hScreenBitmap = NULL;
+    }
+
     if (m_pBmpRawData)
     {
         delete[] m_pBmpRawData;
