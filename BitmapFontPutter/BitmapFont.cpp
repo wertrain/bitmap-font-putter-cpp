@@ -185,7 +185,7 @@ void BitmapFont::Destroy()
     }
 }
 
-uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c)
+uint32_t BitmapFont::DrawSJISChar(const int32_t x, const int32_t y, const int32_t c)
 {
     // ビットマップデータにおける文字の位置を取得する
     const uint32_t charPos = GetCharPos(c);
@@ -223,13 +223,13 @@ uint32_t BitmapFont::DrawSJISChar(const HDC hDC, const int32_t x, const int32_t 
             const uint8_t r = static_cast<uint8_t>(inputR * fColor) + bitmapInvA,
                           g = static_cast<uint8_t>(inputG * fColor) + bitmapInvA,
                           b = static_cast<uint8_t>(inputB * fColor) + bitmapInvA;
-            SetPixel(hDC, x + px, y + py, RGB(r, g, b));
+            SetPixel(m_hScreenDeviceContext, x + px, y + py, RGB(r, g, b));
         }
     }
     return maxWidth;
 }
 
-void BitmapFont::DrawSJISString(const HDC hDC, const int32_t x, const int32_t y, const char* str)
+void BitmapFont::DrawSJISString(const int32_t x, const int32_t y, const char* str)
 {
     const char *ptr = str;
     int32_t posX = x, posY = y;
@@ -240,24 +240,24 @@ void BitmapFont::DrawSJISString(const HDC hDC, const int32_t x, const int32_t y,
         else                      c = *ptr;
         if (*ptr)
         {
-            posX += DrawSJISChar(hDC, posX, posY, c);
+            posX += DrawSJISChar(posX, posY, c);
             ++ptr;
         }
     }
 }
 
-uint32_t BitmapFont::DrawChar(const HDC hDC, const int32_t x, const int32_t y, const int32_t c)
+uint32_t BitmapFont::DrawChar(const int32_t x, const int32_t y, const int32_t c)
 {
-    return DrawSJISChar(hDC, x, y, m_CharCodeConverter->UTF16BEtoSJIS(c));
+    return DrawSJISChar(x, y, m_CharCodeConverter->UTF16BEtoSJIS(c));
 }
 
-void BitmapFont::DrawString(const HDC hDC, const int32_t x, const int32_t y, const wchar_t* str)
+void BitmapFont::DrawString(const int32_t x, const int32_t y, const wchar_t* str)
 {
     const wchar_t *ptr = str;
     int32_t posX = x, posY = y;
     while (*ptr)
     {
-        posX += DrawChar(hDC, posX, posY, (*ptr));
+        posX += DrawChar(posX, posY, (*ptr));
         ++ptr;
     }
 }
@@ -265,6 +265,19 @@ void BitmapFont::DrawString(const HDC hDC, const int32_t x, const int32_t y, con
 void BitmapFont::SetColor(const uint8_t r, const uint8_t g, const uint8_t b)
 {
     m_Color = RGB(r, g, b);
+}
+
+void BitmapFont::ClearBuffer(const uint8_t r, const uint8_t g, const uint8_t b)
+{
+    HBRUSH brush = CreateSolidBrush(RGB(r, g, b));
+    SelectObject(m_hScreenDeviceContext, brush);
+    PatBlt(m_hScreenDeviceContext, 0, 0, Framework::Constants::WIDTH, Framework::Constants::HEIGHT, PATCOPY);
+    DeleteObject(brush);
+}
+
+void BitmapFont::PresentBuffer(const HDC hDC)
+{
+    BitBlt(hDC, 0, 0, Framework::Constants::WIDTH, Framework::Constants::HEIGHT, m_hScreenDeviceContext, 0, 0, SRCCOPY);
 }
 
 bool BitmapFont::GetCharWidth(const uint32_t charPos, int32_t *minWidth, int32_t *maxWidth)
