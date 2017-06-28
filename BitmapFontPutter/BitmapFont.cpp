@@ -98,14 +98,16 @@ BitmapFont::~BitmapFont()
 
 }
 
-bool BitmapFont::Create(const char* filename)
+bool BitmapFont::Create(HWND hWnd, const char* filename)
 {
+    // 文字コード変換を初期化
     m_CharCodeConverter = new CharCodeConverter();
     if (!m_CharCodeConverter->Initialize())
     {
         return false;
     }
 
+    // フォント画像ファイルを開く
     std::ifstream ifs;
     ifs.open(filename, std::ios::binary);
     assert(ifs);
@@ -123,6 +125,7 @@ bool BitmapFont::Create(const char* filename)
     ifs.read((char*)(m_pBmpRawData), size);
     ifs.close();
 
+    // 使用できるビットマップ画像であるか確認する
     uint32_t bitCount = 0;
     m_pBmpPixelBuffer = ::GetBmpFileData(m_pBmpRawData, m_BmpWidth, m_BmpHeight, bitCount);
     assert(bitCount == 32);
@@ -131,19 +134,8 @@ bool BitmapFont::Create(const char* filename)
         return false;
     }
 
-    // ビットマップ一行分のサイズを求める
-    m_BmpCharLizeSize = (m_BmpWidth * BitmapFont::FONT_CHAR_HEIGHT * BitmapFont::FONT_BIT);
-
-    return true;
-}
-
-bool BitmapFont::Create(HWND hWnd, const char* filename)
-{
-    if (!Create(filename)) return false;
-
-    HDC hdc = GetDC(hWnd);
-
     // 画面サイズ分の互換ビットマップを作成
+    HDC hdc = GetDC(hWnd);
     m_hScreenBitmap = CreateCompatibleBitmap(hdc, Framework::Constants::WIDTH, Framework::Constants::HEIGHT);
     m_hScreenDeviceContext = CreateCompatibleDC(hdc);
 
@@ -153,6 +145,9 @@ bool BitmapFont::Create(HWND hWnd, const char* filename)
     PatBlt(m_hScreenDeviceContext, 0, 0, Framework::Constants::WIDTH, Framework::Constants::HEIGHT, WHITENESS);
 
     ReleaseDC(hWnd, hdc);
+
+    // ビットマップ一行分のサイズを求める
+    m_BmpCharLizeSize = (m_BmpWidth * BitmapFont::FONT_CHAR_HEIGHT * BitmapFont::FONT_BIT);
 
     return true;
 }

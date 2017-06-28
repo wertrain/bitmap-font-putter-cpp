@@ -26,12 +26,6 @@ public:
      * @param 表示する画像パス。
      * @return 成功/失敗
      */
-    bool Create(const char* filename);
-    /**
-    * 作成します。
-    * @param 表示する画像パス。
-    * @return 成功/失敗
-    */
     bool Create(HWND hWnd, const char* filename);
     /**
      * 破棄します。
