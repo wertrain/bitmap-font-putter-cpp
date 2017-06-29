@@ -10,7 +10,15 @@ class CharCodeConverter
 public:
     CharCodeConverter();
     ~CharCodeConverter();
+    /**
+     * 初期化します。
+     * @return 関数の成否
+     */
     bool Initialize();
+    /**
+     * 破棄します。
+     *
+     */
     void Finalize();
 
     /**
