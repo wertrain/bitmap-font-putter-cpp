@@ -203,7 +203,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, PSTR /*lpCm
     DWORD dwStyle = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX; // ウィンドウの大きさ変更できないように
 
     hwnd = CreateWindowEx(
-        0, TEXT("GameFramework") , TEXT("Windows Native GameFramework") ,
+        0, TEXT("GameFramework") , TEXT(Framework::Constants::WINDOW_TITLE) ,
         dwStyle,
         CW_USEDEFAULT, CW_USEDEFAULT ,
         CW_USEDEFAULT, CW_USEDEFAULT ,

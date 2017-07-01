@@ -6,6 +6,7 @@ namespace Framework
 namespace Constants
 {
 
+static const char* WINDOW_TITLE = "Bitmap Font";
 static const int WIDTH = 800;
 static const int HEIGHT = 600;
 static const int FPS = 60;
