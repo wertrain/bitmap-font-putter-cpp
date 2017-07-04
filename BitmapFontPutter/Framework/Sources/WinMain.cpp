@@ -9,10 +9,11 @@
 namespace Framework
 {
 
+// スレッド終了フラグ
 static bool s_ExitThread = false;
 
 // ゲームウィンドウ構造体
-typedef struct GameWindow
+typedef struct GameWindow_
 {
     HWND hWnd;      // ウインドウ
     HDC hScreenDC;  // バックバッファ
@@ -164,12 +165,12 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             }
 
             //スレッドの作成と実行
-            hThread = CreateThread(NULL,          // ハンドルを他のプロセスと共有する場合
-                0,                      // スタックサイズ(デフォルト:0)
-                Framework::GameMainFunc,// スレッド関数名
-                (LPVOID)&gameWindow,    // スレッドに渡す構造体
-                0,                      // 0:作成と同時に実行
-                &dwID);                 // スレッドID
+            hThread = CreateThread(NULL, // ハンドルを他のプロセスと共有する場合
+                0,                       // スタックサイズ(デフォルト:0)
+                Framework::GameMainFunc, // スレッド関数名
+                (LPVOID)&gameWindow,     // スレッドに渡す構造体
+                0,                       // 0:作成と同時に実行
+                &dwID);                  // スレッドID
         
             return 0;
 
